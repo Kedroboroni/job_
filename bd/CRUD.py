@@ -9,11 +9,10 @@ from bd.entities import *
 from sqlalchemy import text
 
 
-# Подключение к базе данных (замените 'sqlite:///your_database.db' на ваш путь к базе данных)
+
 engine = create_engine(r"sqlite:///bd\bd.db")
 Base.metadata.create_all(engine)
 
-# Создание сессии
 Session = sessionmaker(bind=engine)
 session = Session()
 
@@ -59,19 +58,22 @@ def search_obtt_by_value(column_name, value):
     Поиск записей в таблице OBTT, где значение в указанном столбце больше или равно указанному значению.
     Результаты сортируются по указанному столбцу.
     """
-    return session.query(OBTT).filter(getattr(OBTT, column_name) >= value).order_by(getattr(OBTT, column_name)).all()
+    column = getattr(OBTT, column_name)
+    query = session.query(OBTT).filter(column >= value).order_by(column)
+
+    return query
+
 
 def add_column_to_obtt(column_name, column_type):
     """
     Добавление нового столбца в таблицу OBTT.
     """
-    from sqlalchemy import text
     sql = text(f'ALTER TABLE OBTT ADD COLUMN {column_name} {column_type.__class__.__name__}')
     with engine.connect() as connection:
         with connection.begin():
             connection.execute(sql)
             connection.commit()
-    print(f"Колонка '{column_name}' успешно добавлена в таблицу OBTT.")
+
 
 def rewrite_value(obtt_id, column_name, new_value):
     """
@@ -84,47 +86,75 @@ def rewrite_value(obtt_id, column_name, new_value):
         return obtt
     return None
 
+def read_all():
+
+    return session.query(OBTT).all()
+
+
+def search_by_value(column_name, value):
+    """
+    Поиск записей в таблице OBTT, где значение в указанном столбце больше или равно указанному значению.
+    Результаты сортируются по указанному столбцу.
+    
+    Args:
+        column_name (str): Имя колонки для поиска
+        value: Значение для сравнения
+        
+    Returns:
+        list: Список объектов OBTT, удовлетворяющих условию
+    """
+    try:
+        column = getattr(OBTT, column_name)
+        query = session.query(OBTT).filter(column >= value).order_by(column)
+
+        return query.all()
+    except Exception as e:
+        raise Exception(f"Ошибка при выполнении запроса: {str(e)}")
+    
+
+def get_name():
+
+    query_id = session.query(OBTT.id)
+    query = session.query(OBTT.name)
+
+    return ([row[0] for row in query.all()], [row_id[0] for row_id in query_id.all()])
+
 
 
 
 
 if __name__ == "__main__":
-    # Пример создания новой записи
-    try:
-        new_obtt = create_obtt(**{"name":"Object4321", "width":10.5, "length":"20.31", "height":5.0, "dir":"north"})
-        print(f"Создана новая запись: ID={new_obtt.id}, Name={new_obtt.name}")
-    except StatementError:
-        print("УПС!")
+    #try:
+       # new_obtt = create_obtt(**{"name":"Object4321", "width":10.5, "length":"20.31", "height":5.0, "dir":"north"})
+        #print(f"Создана новая запись: ID={new_obtt.id}, Name={new_obtt.name}")
+    #except StatementError:
+        #print("УПС!")
 
-    # Пример чтения записи по ID
-    obtt = read_obtt(new_obtt.id)
-    if obtt:
-        print(f"Прочитана запись: ID={obtt.id}, Name={obtt.name}, Width={obtt.width}, Length={obtt.length}, Height={obtt.height}, Dir={obtt.dir}")
-    else:
-        print("Запись не найдена.")
+    #obtt = read_obtt(new_obtt.id)
+    #if obtt:
+        #print(f"Прочитана запись: ID={obtt.id}, Name={obtt.name}, Width={obtt.width}, Length={obtt.length}, Height={obtt.height}, Dir={obtt.dir}")
+    #else:
+        #print("Запись не найдена.")
 
-    # Пример поиска записей с шириной >= 10.0
-    results = search_obtt_by_value(column_name="length", value=20.0)
-    print("Результаты поиска (ширина >= 10.0):")
+    results = search_by_value(column_name="height", value=50.0)
+    #results = read_all()
+    print("Результаты поиска (height >= 50.0):")
     for result in results:
-        print(f"ID={result.id}, Name={result.name}, Width={result.width}")
+        print(f"ID123={result.id}, Name={result.name}, Height={result.height}")
 
-    # Пример обновления записи
-    updated_obtt = update_obtt(obtt_id=new_obtt.id, column_name="width", new_value=15.0)
-    if updated_obtt:
-        print(f"Запись обновлена: ID={updated_obtt.id}, Новое значение width={updated_obtt.width}")
-    else:
-        print("Запись для обновления не найдена.")
+    #updated_obtt = update_obtt(obtt_id=new_obtt.id, column_name="width", new_value=15.0)
+    #if updated_obtt:
+        #print(f"Запись обновлена: ID={updated_obtt.id}, Новое значение width={updated_obtt.width}")
+    #else:
+        #print("Запись для обновления не найдена.")
 
-    # Пример перезаписи значения в объекте
-    rewritten_obtt = rewrite_value(obtt_id=new_obtt.id, column_name="dir", new_value="123123")
-    if rewritten_obtt:
-        print(f"Значение перезаписано: ID={rewritten_obtt.id}, Новое значение={rewritten_obtt.dir}")
+   # rewritten_obtt = rewrite_value(obtt_id=new_obtt.id, column_name="dir", new_value="123123")
+    #if rewritten_obtt:
+        #print(f"Значение перезаписано: ID={rewritten_obtt.id}, Новое значение={rewritten_obtt.dir}")
         
-    else:
-        print("Запись для перезаписи не найдена.")
+    #else:
+       # print("Запись для перезаписи не найдена.")
 
-    # Пример удаления записи
     #if delete_obtt(new_obtt.id):
         #print(f"Запись с ID={new_obtt.id} удалена.")
     #else:

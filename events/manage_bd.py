@@ -9,25 +9,30 @@ def update_bd(values):
         
         name_column = [col.name for col in OBTT.__table__.columns][1:]
         params = {name_column[i]: value for i, value in enumerate(values)}
-        print(params)
         
-        new_obtt = create_obtt(**params)
+        create_obtt(**params)
 
     except StatementError:
         raise ValueError
     
 
 def search_by_value(id, value):
-
     results = search_obtt_by_value(column_name=id, value=value)
-    res = np.array([[res.id,
-                     res.name,
-                     res.width,
-                     res.length,
-                     res.height,
-                     res.dir] for res in results])
-    return res
-    
+    attrs = [col.name for col in OBTT.__table__.columns]
+    rows = [[getattr(res, attr) for attr in attrs] for res in results]
+
+    return np.array(rows)
+
+
+def Obtt(name):
+
+    names, name_id  = get_name()
+    id = name_id[names.index(name)]
+    result = read_obtt(id)
+    attrs = [col.name for col in OBTT.__table__.columns]
+    params = [getattr(result, attr) for attr in attrs]
+
+    return params    
     
 
 
