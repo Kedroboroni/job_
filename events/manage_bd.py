@@ -2,6 +2,7 @@ from bd.CRUD import *
 from bd.entities import *
 from utils.utils import *
 from sqlalchemy.exc import StatementError
+import numpy as np
 
 def update_bd(values):
     try:
@@ -19,8 +20,14 @@ def update_bd(values):
 def search_by_value(id, value):
 
     results = search_obtt_by_value(column_name=id, value=value)
+    res = np.array([[res.id,
+                     res.name,
+                     res.width,
+                     res.length,
+                     res.height,
+                     res.dir] for res in results])
+    return res
     
-
     
 
 

@@ -5,7 +5,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(
 from sqlalchemy import create_engine, Float, String, Integer
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import StatementError
-from entities import *
+from bd.entities import *
 from sqlalchemy import text
 
 
@@ -104,7 +104,7 @@ if __name__ == "__main__":
         print("Запись не найдена.")
 
     # Пример поиска записей с шириной >= 10.0
-    results = search_obtt_by_value(column_name="width", value=10.0)
+    results = search_obtt_by_value(column_name="length", value=20.0)
     print("Результаты поиска (ширина >= 10.0):")
     for result in results:
         print(f"ID={result.id}, Name={result.name}, Width={result.width}")
