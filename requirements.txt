@@ -1,0 +1,94 @@
+greenlet==3.1.1
+numpy==2.2.3
+opencv-python==4.11.0.86   
+PySide6==6.8.2.1
+PySide6_Addons==6.8.2.1    
+PySide6_Essentials==6.8.2.1
+shiboken6==6.8.2.1
+SQLAlchemy==2.0.38
+typing_extensions==4.12.2 
+alembic==1.15.1
+
+
+
+from sqlalchemy import create_engine, Column, String, Float, Integer
+from sqlalchemy.orm import sessionmaker
+from entities import Base, OBTT
+import os
+import numpy as np
+from alembic.runtime import migration
+from alembic.operations import ops
+from alembic.runtime import migration
+from sqlalchemy.schema import Table
+
+def add_new_column(self, column_name, data_type):
+        """
+        Добавление нового столбца к существующей таблице
+        
+        Args:
+            column_name (str): Имя нового столбца
+            data_type (str): Тип данных ('str', 'float', 'int')
+            
+        Raises:
+            ValueError: Если тип данных не поддерживается
+            Exception: При ошибках работы с базой данных
+        """
+        supported_types = {
+            'str': String,
+            'float': Float,
+            'int': Integer
+        }
+        
+        if data_type.lower() not in supported_types:
+            raise ValueError("Неподдерживаемый тип данных. Поддерживаются: str, float, int")
+            
+        try:
+            #record = OBTT()
+            # Проверяем, существует ли столбец
+            existing_columns = [col.name for col in record.__table__.columns]
+            if column_name in existing_columns:
+                raise ValueError(f"Столбец '{column_name}' уже существует в таблице")
+                
+            # Создаём новый столбец
+            new_column = Column(column_name, supported_types[data_type.lower()])
+            
+            # Добавляем столбец к классу OBTT
+            setattr(OBTT, column_name, new_column)
+            
+            with self.engine.connect() as conn:
+                # Создаём контекст миграции
+                ctx = migration.MigrationContext.configure(conn)
+                
+                # Получаем объект операций
+                op_obj = ops.Operations(ctx)
+                
+                # Добавляем новый столбец
+                op_obj.add_column(
+                    'OBTT',~
+                    Column(column_name, supported_types[data_type.lower()])
+                )
+                
+        except Exception as e:
+            raise Exception(f"Ошибка при добавлении столбца: {str(e)}")
+
+
+    def _record_to_array(self, record):
+        """
+        Преобразование записи в массив значений
+        
+        Args:
+            record: Запись из базы данных
+            
+        Returns:
+            list: Список значений записи в определенном порядке
+        """
+        # Получаем все колонки из таблицы
+        column_order = [col.name for col in record.__table__.columns]
+        #print(f"123123123123       {type(column_order)}")
+        #print(f"------------       {column_order}")
+        
+        # Создаем список значений в указанном порядке
+        values = [getattr(record, col) for col in column_order]
+        print(values)
+        
+        return values
