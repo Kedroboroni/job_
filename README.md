@@ -1,8 +1,3 @@
-<p align="center">
-    <a href="https://t.me/KedrOboroni">Сообщи об ошибке!</a>
-  </p>
-
-
 # Приложение для управления объектами базы данных
 
 ## Описание
@@ -82,5 +77,6 @@ python ui/mainUi.py
 - NumPy
 - Alembic
 
-## Лицензия
-MIT 
+<p align="center">
+    <a href="https://t.me/KedrOboroni">Сообщи об ошибке!</a>
+</p>
