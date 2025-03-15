@@ -50,7 +50,6 @@ BD_objects/
    - SQLite база данных
    - Модели данных для объектов
    - CRUD операции
-   - Миграции через Alembic
 
 3. **Обработка событий**
    - Управление действиями пользователя
@@ -75,7 +74,6 @@ python ui/mainUi.py
 - SQLAlchemy
 - OpenCV
 - NumPy
-- Alembic
 
 <p align="center">
     <a href="https://t.me/KedrOboroni">Сообщи об ошибке!</a>
